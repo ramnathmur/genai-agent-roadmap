@@ -1,0 +1,2098 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GenAI Agent Development Roadmap</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { 50:'#f0f5ff',100:'#e0ebff',200:'#b8d4fe',300:'#7ab5ff',400:'#3b8bfd',500:'#1a6dff',600:'#0050e0',700:'#003db5',800:'#003494',900:'#002d7a' },
+                        surface: { 50:'#f8fafc',100:'#f1f5f9',200:'#e2e8f0',300:'#cbd5e1',400:'#94a3b8',500:'#64748b',600:'#475569',700:'#334155',800:'#1e293b',900:'#0f172a',950:'#020617' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        code, pre { font-family: 'JetBrains Mono', monospace !important; }
+        .gradient-text { background: linear-gradient(135deg, #1a6dff 0%, #7ab5ff 50%, #3b8bfd 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.3); }
+        .glass-dark { background: rgba(15,23,42,0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
+        .stage-card { transition: all 0.3s ease; }
+        .stage-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .code-tab.active { background: #1e293b; color: #7ab5ff; border-bottom: 2px solid #3b8bfd; }
+        .code-tab { cursor: pointer; padding: 8px 16px; border-bottom: 2px solid transparent; transition: all 0.2s; }
+        .code-tab:hover { background: #334155; }
+        .sidebar-link { transition: all 0.2s; border-left: 3px solid transparent; }
+        .sidebar-link:hover, .sidebar-link.active { background: rgba(59,139,253,0.1); border-left-color: #3b8bfd; color: #3b8bfd; }
+        .progress-ring { transition: stroke-dashoffset 0.5s ease; }
+        .tooltip { position: relative; }
+        .tooltip::after { content: attr(data-tip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 4px 8px; border-radius: 6px; font-size: 12px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+        .tooltip:hover::after { opacity: 1; }
+        .checklist-item input:checked + span { text-decoration: line-through; color: #94a3b8; }
+        pre[class*="language-"] { border-radius: 0 0 8px 8px !important; margin: 0 !important; }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+        .accordion-content.open { max-height: 5000px; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        .hero-bg { background: linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #002d7a 100%); }
+        .floating { animation: float 6s ease-in-out infinite; }
+        @keyframes float { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-15px); } }
+        .pulse-dot { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+    </style>
+</head>
+<body class="bg-surface-50 text-surface-800">
+
+<!-- SIDEBAR NAVIGATION -->
+<aside id="sidebar" class="fixed left-0 top-0 h-full w-64 bg-white border-r border-surface-200 z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 overflow-y-auto">
+    <div class="p-6 border-b border-surface-200">
+        <h2 class="text-lg font-bold gradient-text">🤖 GenAI Roadmap</h2>
+        <p class="text-xs text-surface-500 mt-1">Ram's Agent Dev Journey</p>
+    </div>
+    <div class="p-4">
+        <!-- Progress Overview -->
+        <div class="mb-6 p-3 bg-brand-50 rounded-lg">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-semibold text-brand-700">Overall Progress</span>
+                <span id="progress-pct" class="text-xs font-bold text-brand-600">0%</span>
+            </div>
+            <div class="w-full h-2 bg-brand-100 rounded-full overflow-hidden">
+                <div id="progress-bar" class="h-full bg-gradient-to-r from-brand-500 to-brand-400 rounded-full transition-all duration-500" style="width:0%"></div>
+            </div>
+        </div>
+
+        <nav class="space-y-1">
+            <a href="#hero" class="sidebar-link block px-3 py-2 text-sm rounded-r-lg">🏠 Overview</a>
+            <a href="#stage1" class="sidebar-link block px-3 py-2 text-sm rounded-r-lg">📚 Stage 1: Foundations</a>
+            <a href="#stage2" class="sidebar-link block px-3 py-2 text-sm rounded-r-lg">🔗 Stage 2: Pipelines</a>
+            <a href="#stage3" class="sidebar-link block px-3 py-2 text-sm rounded-r-lg">🔧 Stage 3: Tool Use</a>
+            <a href="#stage4" class="sidebar-link block px-3 py-2 text-sm rounded-r-lg">🧠 Stage 4: Memory</a>
+            <a href="#stage5" class="sidebar-link block px-3 py-2 text-sm rounded-r-lg">🔄 Stage 5: ReAct Loop</a>
+            <a href="#stage6" class="sidebar-link block px-3 py-2 text-sm rounded-r-lg">👥 Stage 6: Multi-Agent</a>
+            <a href="#stack" class="sidebar-link block px-3 py-2 text-sm rounded-r-lg">🛠️ Tech Stack</a>
+            <a href="#resources" class="sidebar-link block px-3 py-2 text-sm rounded-r-lg">📖 Resources</a>
+        </nav>
+    </div>
+</aside>
+
+<!-- MOBILE MENU BUTTON -->
+<button id="menu-btn" class="fixed top-4 left-4 z-50 lg:hidden bg-white p-2 rounded-lg shadow-lg" onclick="toggleSidebar()">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+</button>
+
+<!-- MAIN CONTENT -->
+<main class="lg:ml-64">
+
+    <!-- HERO SECTION -->
+    <section id="hero" class="hero-bg text-white min-h-screen flex items-center relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-20 left-20 w-72 h-72 bg-brand-400 rounded-full filter blur-3xl floating"></div>
+            <div class="absolute bottom-20 right-20 w-96 h-96 bg-brand-600 rounded-full filter blur-3xl floating" style="animation-delay: -3s;"></div>
+        </div>
+        <div class="relative max-w-5xl mx-auto px-8 py-20">
+            <div class="inline-block px-4 py-1 bg-brand-600/30 rounded-full text-brand-200 text-sm font-medium mb-6">
+                🚀 12-Week Intensive Learning Path
+            </div>
+            <h1 class="text-5xl md:text-7xl font-black mb-6 leading-tight">
+                GenAI Agent<br><span class="gradient-text">Development</span><br>Roadmap
+            </h1>
+            <p class="text-xl text-surface-300 max-w-2xl mb-8">
+                From raw API calls to production-grade multi-agent systems. A hands-on roadmap with real code, real projects, and deep understanding at every step.
+            </p>
+            <div class="flex flex-wrap gap-4 mb-12">
+                <a href="#stage1" class="px-6 py-3 bg-brand-500 hover:bg-brand-600 rounded-lg font-semibold transition-colors">Start Learning →</a>
+                <a href="#stack" class="px-6 py-3 bg-white/10 hover:bg-white/20 rounded-lg font-semibold transition-colors">View Tech Stack</a>
+            </div>
+            <!-- Stage Overview Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <div class="glass-dark rounded-lg p-4 stage-card">
+                    <div class="text-2xl mb-2">📚</div>
+                    <div class="text-sm font-semibold">Stage 1</div>
+                    <div class="text-xs text-surface-400">LLM Foundations</div>
+                </div>
+                <div class="glass-dark rounded-lg p-4 stage-card">
+                    <div class="text-2xl mb-2">🔗</div>
+                    <div class="text-sm font-semibold">Stage 2</div>
+                    <div class="text-xs text-surface-400">Pipelines</div>
+                </div>
+                <div class="glass-dark rounded-lg p-4 stage-card">
+                    <div class="text-2xl mb-2">🔧</div>
+                    <div class="text-sm font-semibold">Stage 3</div>
+                    <div class="text-xs text-surface-400">Tool Use</div>
+                </div>
+                <div class="glass-dark rounded-lg p-4 stage-card">
+                    <div class="text-2xl mb-2">🧠</div>
+                    <div class="text-sm font-semibold">Stage 4</div>
+                    <div class="text-xs text-surface-400">Memory</div>
+                </div>
+                <div class="glass-dark rounded-lg p-4 stage-card">
+                    <div class="text-2xl mb-2">🔄</div>
+                    <div class="text-sm font-semibold">Stage 5</div>
+                    <div class="text-xs text-surface-400">ReAct Agents</div>
+                </div>
+                <div class="glass-dark rounded-lg p-4 stage-card">
+                    <div class="text-2xl mb-2">👥</div>
+                    <div class="text-sm font-semibold">Stage 6</div>
+                    <div class="text-xs text-surface-400">Multi-Agent</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!--                    STAGE 1: FOUNDATIONS                       -->
+    <!-- ============================================================ -->
+    <section id="stage1" class="py-20 px-8 max-w-5xl mx-auto">
+        <div class="flex items-center gap-4 mb-2">
+            <span class="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full">WEEKS 1–2</span>
+            <label class="flex items-center gap-2 text-sm text-surface-500 cursor-pointer checklist-item">
+                <input type="checkbox" class="stage-check" data-stage="1" onchange="updateProgress()">
+                <span>Mark Complete</span>
+            </label>
+        </div>
+        <h2 class="text-4xl font-black mb-4">📚 Stage 1: Master the Foundation</h2>
+        <p class="text-lg text-surface-600 mb-8 max-w-3xl">
+            Before you build agents, deeply understand what an LLM actually <em>is</em> as a programmable component. Mental model: <strong>an LLM is a function — text in, text out. Your job is to control the input.</strong>
+        </p>
+
+        <!-- Key Concepts -->
+        <div class="grid md:grid-cols-3 gap-4 mb-10">
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-surface-100">
+                <div class="text-2xl mb-2">💬</div>
+                <h3 class="font-bold mb-1">Messages Array</h3>
+                <p class="text-sm text-surface-600">The core interface: <code class="bg-surface-100 px-1 rounded text-xs">system</code>, <code class="bg-surface-100 px-1 rounded text-xs">user</code>, <code class="bg-surface-100 px-1 rounded text-xs">assistant</code> roles form the conversation structure.</p>
+            </div>
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-surface-100">
+                <div class="text-2xl mb-2">🎛️</div>
+                <h3 class="font-bold mb-1">Temperature</h3>
+                <p class="text-sm text-surface-600">Controls randomness: 0 = deterministic, 1 = creative. For agents, lower is usually better (reliable outputs).</p>
+            </div>
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-surface-100">
+                <div class="text-2xl mb-2">📝</div>
+                <h3 class="font-bold mb-1">Prompt Engineering</h3>
+                <p class="text-sm text-surface-600">Zero-shot, few-shot, chain-of-thought, structured output — four techniques you must master.</p>
+            </div>
+        </div>
+
+        <!-- Tutorial: Raw API Call -->
+        <div class="bg-white rounded-xl shadow-sm border border-surface-100 overflow-hidden mb-8">
+            <div class="border-b border-surface-100 px-6 py-4">
+                <h3 class="font-bold text-lg">🔬 Tutorial: Raw API Calls (No Framework)</h3>
+                <p class="text-sm text-surface-500">Understanding what frameworks abstract away from you</p>
+            </div>
+            <!-- Code Tabs -->
+            <div class="flex bg-surface-800 border-b border-surface-700">
+                <div class="code-tab active" onclick="switchTab(this, 's1-openai')">OpenAI SDK</div>
+                <div class="code-tab" onclick="switchTab(this, 's1-anthropic')">Anthropic SDK</div>
+                <div class="code-tab" onclick="switchTab(this, 's1-prompts')">Prompt Techniques</div>
+            </div>
+            <div id="s1-openai" class="code-panel">
+<pre><code class="language-python">"""
+Stage 1 — Raw OpenAI API: Build a Q&A bot from scratch
+WHY: Understanding the messages array is the foundation of everything.
+     Every framework (LangChain, CrewAI) is just a wrapper around this.
+"""
+import os
+from openai import OpenAI
+
+# Initialize the client — reads OPENAI_API_KEY from environment
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+def chat_completion(messages: list[dict], temperature: float = 0.7) -> str:
+    """Send messages to the LLM and get a response.
+
+    Think of this like calling a really smart function:
+    - Input: list of messages (the conversation so far)
+    - Output: the assistant's next response
+    """
+    response = client.chat.completions.create(
+        model="gpt-4o",          # The model to use
+        messages=messages,        # Full conversation history
+        temperature=temperature,  # 0=deterministic, 1=creative
+        max_tokens=1024          # Cap the response length
+    )
+    # The response contains choices — we want the first one's content
+    return response.choices[0].message.content
+
+def run_chatbot():
+    """A simple chatbot loop that maintains conversation history.
+
+    KEY INSIGHT: We manually manage the messages list.
+    This is EXACTLY what frameworks do behind the scenes.
+    """
+    # System message sets the personality/behavior
+    messages = [
+        {
+            "role": "system",
+            "content": (
+                "You are a helpful AI tutor specializing in Python "
+                "and machine learning. Give concise, clear answers "
+                "with code examples when appropriate."
+            )
+        }
+    ]
+
+    print("🤖 AI Tutor Bot (type 'quit' to exit)")
+    print("=" * 50)
+
+    while True:
+        user_input = input("\n📝 You: ").strip()
+        if user_input.lower() in ("quit", "exit", "q"):
+            print("👋 Goodbye!")
+            break
+
+        # Add user message to conversation history
+        messages.append({"role": "user", "content": user_input})
+
+        # Get the assistant's response
+        assistant_reply = chat_completion(messages)
+
+        # Add assistant response to history (this is how context works!)
+        messages.append({"role": "assistant", "content": assistant_reply})
+
+        print(f"\n🤖 Bot: {assistant_reply}")
+
+        # Show how many messages are in context (educational)
+        print(f"\n   [📊 Context: {len(messages)} messages]")
+
+if __name__ == "__main__":
+    run_chatbot()
+</code></pre>
+            </div>
+            <div id="s1-anthropic" class="code-panel" style="display:none">
+<pre><code class="language-python">"""
+Stage 1 — Raw Anthropic API: Same bot, different provider
+WHY: Knowing both SDKs makes you provider-agnostic.
+     The concepts are identical — only syntax differs.
+"""
+import os
+from anthropic import Anthropic
+
+# Initialize the Anthropic client
+client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+
+def chat_completion(messages: list[dict], system: str = "", temperature: float = 0.7) -> str:
+    """Send messages to Claude and get a response.
+
+    KEY DIFFERENCE from OpenAI:
+    - System prompt is a separate parameter, not in messages
+    - Model names are different (claude-sonnet-4-6 vs gpt-4o)
+    """
+    response = client.messages.create(
+        model="claude-sonnet-4-6",   # Anthropic's model
+        max_tokens=1024,
+        system=system,               # System prompt is separate!
+        messages=messages,            # Only user/assistant messages
+        temperature=temperature
+    )
+    # Anthropic returns content as a list of blocks
+    return response.content[0].text
+
+def run_chatbot():
+    """Same chatbot, Anthropic flavor."""
+    system_prompt = (
+        "You are a helpful AI tutor specializing in Python "
+        "and machine learning. Give concise, clear answers "
+        "with code examples when appropriate."
+    )
+
+    messages = []  # No system message here — it's a separate param
+
+    print("🤖 Claude Tutor Bot (type 'quit' to exit)")
+    print("=" * 50)
+
+    while True:
+        user_input = input("\n📝 You: ").strip()
+        if user_input.lower() in ("quit", "exit", "q"):
+            print("👋 Goodbye!")
+            break
+
+        messages.append({"role": "user", "content": user_input})
+
+        assistant_reply = chat_completion(
+            messages, system=system_prompt
+        )
+
+        messages.append({"role": "assistant", "content": assistant_reply})
+
+        print(f"\n🤖 Claude: {assistant_reply}")
+
+if __name__ == "__main__":
+    run_chatbot()
+</code></pre>
+            </div>
+            <div id="s1-prompts" class="code-panel" style="display:none">
+<pre><code class="language-python">"""
+Stage 1 — Prompt Engineering Techniques
+WHY: The quality of your prompts determines the quality of agent behavior.
+     These 4 techniques are your daily tools.
+"""
+from openai import OpenAI
+client = OpenAI()
+
+def call_llm(messages, temperature=0.3):
+    """Helper to call the LLM."""
+    resp = client.chat.completions.create(
+        model="gpt-4o", messages=messages, temperature=temperature
+    )
+    return resp.choices[0].message.content
+
+# ──────────────────────────────────────────────────
+# TECHNIQUE 1: Zero-Shot (just ask directly)
+# ──────────────────────────────────────────────────
+zero_shot = call_llm([
+    {"role": "user", "content": "Classify this review as positive or negative: 'The battery life is amazing but the screen is dim.'"}
+])
+print(f"Zero-shot: {zero_shot}")
+
+# ──────────────────────────────────────────────────
+# TECHNIQUE 2: Few-Shot (provide examples first)
+# ──────────────────────────────────────────────────
+few_shot = call_llm([
+    {"role": "system", "content": "Classify movie reviews as positive, negative, or mixed."},
+    {"role": "user", "content": "Review: 'Loved every minute!'"},
+    {"role": "assistant", "content": "positive"},
+    {"role": "user", "content": "Review: 'Terrible acting, great visuals.'"},
+    {"role": "assistant", "content": "mixed"},
+    {"role": "user", "content": "Review: 'The battery life is amazing but the screen is dim.'"}
+])
+print(f"Few-shot: {few_shot}")
+
+# ──────────────────────────────────────────────────
+# TECHNIQUE 3: Chain-of-Thought (think step by step)
+# ──────────────────────────────────────────────────
+cot = call_llm([
+    {"role": "user", "content": """Analyze this review step by step:
+Review: 'The battery life is amazing but the screen is dim.'
+
+Step 1: Identify positive aspects
+Step 2: Identify negative aspects
+Step 3: Weigh overall sentiment
+Step 4: Give final classification"""}
+])
+print(f"Chain-of-thought: {cot}")
+
+# ──────────────────────────────────────────────────
+# TECHNIQUE 4: Structured Output (JSON response)
+# ──────────────────────────────────────────────────
+structured = call_llm([
+    {"role": "system", "content": "You always respond in valid JSON. No other text."},
+    {"role": "user", "content": """Analyze this review and respond in JSON:
+Review: 'The battery life is amazing but the screen is dim.'
+
+JSON format:
+{
+  "sentiment": "positive|negative|mixed",
+  "positive_aspects": ["list"],
+  "negative_aspects": ["list"],
+  "confidence": 0.0-1.0
+}"""}
+])
+print(f"Structured: {structured}")
+</code></pre>
+            </div>
+        </div>
+
+        <!-- Exercise -->
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-6">
+            <h3 class="font-bold text-amber-800 mb-2">🏋️ Stage 1 Project: Build a Q&A Bot from Scratch</h3>
+            <ul class="text-sm text-amber-900 space-y-1 list-disc list-inside">
+                <li>Build a chatbot using ONLY raw API calls (no LangChain)</li>
+                <li>Manage the messages array manually</li>
+                <li>Add a system prompt that gives it a personality</li>
+                <li>Bonus: Add a <code>/style</code> command that switches between concise and detailed modes</li>
+            </ul>
+        </div>
+
+        <!-- Checklist -->
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-surface-100">
+            <h3 class="font-bold mb-3">✅ Stage 1 Checklist</h3>
+            <div class="space-y-2 text-sm">
+                <label class="flex items-center gap-2 cursor-pointer checklist-item"><input type="checkbox" class="rounded" onchange="updateProgress()"><span>Can make raw API calls to OpenAI/Anthropic</span></label>
+                <label class="flex items-center gap-2 cursor-pointer checklist-item"><input type="checkbox" class="rounded" onchange="updateProgress()"><span>Understand the messages array and roles</span></label>
+                <label class="flex items-center gap-2 cursor-pointer checklist-item"><input type="checkbox" class="rounded" onchange="updateProgress()"><span>Know what temperature does and when to adjust it</span></label>
+                <label class="flex items-center gap-2 cursor-pointer checklist-item"><input type="checkbox" class="rounded" onchange="updateProgress()"><span>Can do zero-shot, few-shot, CoT, structured prompting</span></label>
+                <label class="flex items-center gap-2 cursor-pointer checklist-item"><input type="checkbox" class="rounded" onchange="updateProgress()"><span>Built the Q&A bot project</span></label>
+            </div>
+        </div>
+    </section>
+
+    <hr class="max-w-5xl mx-auto border-surface-200">
+
+    <!-- ============================================================ -->
+    <!--                  STAGE 2: PIPELINES                          -->
+    <!-- ============================================================ -->
+    <section id="stage2" class="py-20 px-8 max-w-5xl mx-auto">
+        <div class="flex items-center gap-4 mb-2">
+            <span class="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">WEEKS 3–4</span>
+            <label class="flex items-center gap-2 text-sm text-surface-500 cursor-pointer checklist-item">
+                <input type="checkbox" class="stage-check" data-stage="2" onchange="updateProgress()">
+                <span>Mark Complete</span>
+            </label>
+        </div>
+        <h2 class="text-4xl font-black mb-4">🔗 Stage 2: Deterministic Pipelines</h2>
+        <p class="text-lg text-surface-600 mb-8 max-w-3xl">
+            A pipeline is a fixed sequence of LLM calls — step 1 → step 2 → step 3 with no branching. Think of it like a recipe. <strong>Key insight: Multiple focused LLM calls beat one giant call.</strong>
+        </p>
+
+        <div class="grid md:grid-cols-2 gap-4 mb-10">
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-surface-100">
+                <div class="text-2xl mb-2">🍳</div>
+                <h3 class="font-bold mb-1">Why Pipelines?</h3>
+                <p class="text-sm text-surface-600">One LLM call doing 5 things = unreliable. Five calls each doing 1 thing = robust. Decomposition is the first principle of reliable AI systems.</p>
+            </div>
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-surface-100">
+                <div class="text-2xl mb-2">🔀</div>
+                <h3 class="font-bold mb-1">Pipeline vs Agent</h3>
+                <p class="text-sm text-surface-600">Pipelines follow a fixed path. Agents decide their own path. Start with pipelines — they're predictable and debuggable.</p>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-surface-100 overflow-hidden mb-8">
+            <div class="border-b border-surface-100 px-6 py-4">
+                <h3 class="font-bold text-lg">🔬 Tutorial: News Digest Pipeline</h3>
+                <p class="text-sm text-surface-500">Chain multiple LLM calls: Summarize → Classify → Format</p>
+            </div>
+            <div class="flex bg-surface-800 border-b border-surface-700">
+                <div class="code-tab active" onclick="switchTab(this, 's2-raw')">Raw Pipeline</div>
+                <div class="code-tab" onclick="switchTab(this, 's2-lcel')">LCEL Version</div>
+            </div>
+            <div id="s2-raw" class="code-panel">
+<pre><code class="language-python">"""
+Stage 2 — News Digest Pipeline (Raw Implementation)
+WHY: Build it raw first so you understand what LCEL abstracts.
+
+PIPELINE: Fetch → Summarize → Classify → Format
+Each step is a focused LLM call with a specific job.
+"""
+import os
+from openai import OpenAI
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+def call_llm(system: str, user: str, temperature: float = 0.3) -> str:
+    """Wrapper for a single LLM call with system + user message."""
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": system},
+            {"role": "user", "content": user}
+        ],
+        temperature=temperature
+    )
+    return response.choices[0].message.content
+
+# ── STEP 1: Summarize each article ────────────────
+def summarize_article(article_text: str) -> str:
+    """Pipeline Step 1: Compress an article into a 2-sentence summary."""
+    return call_llm(
+        system="You are a news summarizer. Create a clear 2-sentence summary.",
+        user=f"Summarize this article:\n\n{article_text}"
+    )
+
+# ── STEP 2: Classify the topic ────────────────────
+def classify_topic(summary: str) -> str:
+    """Pipeline Step 2: Classify into a category."""
+    return call_llm(
+        system=(
+            "Classify the news summary into exactly one category: "
+            "Technology, Business, Science, Politics, Health, or Other. "
+            "Respond with ONLY the category name."
+        ),
+        user=f"Classify: {summary}"
+    )
+
+# ── STEP 3: Generate formatted digest ─────────────
+def format_digest(classified_articles: list[dict]) -> str:
+    """Pipeline Step 3: Create a polished newsletter from all articles."""
+    articles_text = ""
+    for i, a in enumerate(classified_articles, 1):
+        articles_text += f"\n{i}. [{a['category']}] {a['summary']}\n"
+
+    return call_llm(
+        system=(
+            "You are a newsletter editor. Format the articles into a "
+            "clean, engaging daily digest with category headers. "
+            "Add a brief intro paragraph."
+        ),
+        user=f"Format this into a newsletter:\n{articles_text}"
+    )
+
+# ── RUN THE PIPELINE ──────────────────────────────
+def run_pipeline(articles: list[str]) -> str:
+    """Execute the full pipeline: Summarize → Classify → Format.
+
+    This is deterministic — same steps every time, no branching.
+    Each step does ONE thing well.
+    """
+    print("📰 Starting News Digest Pipeline...")
+    classified = []
+
+    for i, article in enumerate(articles, 1):
+        # Step 1: Summarize
+        print(f"  📝 Summarizing article {i}/{len(articles)}...")
+        summary = summarize_article(article)
+
+        # Step 2: Classify
+        print(f"  🏷️  Classifying article {i}...")
+        category = classify_topic(summary)
+
+        classified.append({"summary": summary, "category": category})
+
+    # Step 3: Format everything together
+    print("  ✨ Formatting digest...")
+    digest = format_digest(classified)
+
+    print("✅ Pipeline complete!")
+    return digest
+
+# ── EXAMPLE USAGE ─────────────────────────────────
+if __name__ == "__main__":
+    sample_articles = [
+        "OpenAI announced GPT-5 with significant improvements in reasoning "
+        "and multimodal capabilities. The model shows 40% improvement on "
+        "graduate-level reasoning benchmarks...",
+
+        "Tesla's Q4 earnings beat analyst expectations with revenue of "
+        "$25.2 billion. The company reported record vehicle deliveries "
+        "and expanding margins in its energy division...",
+
+        "A new CRISPR-based therapy has shown promising results in treating "
+        "sickle cell disease in clinical trials, with 90% of patients "
+        "showing sustained improvement after 12 months..."
+    ]
+
+    digest = run_pipeline(sample_articles)
+    print("\n" + "=" * 60)
+    print(digest)
+</code></pre>
+            </div>
+            <div id="s2-lcel" class="code-panel" style="display:none">
+<pre><code class="language-python">"""
+Stage 2 — Same Pipeline with LangChain LCEL
+WHY: See what LCEL buys you — cleaner chaining, built-in retries,
+     streaming support. But the LOGIC is identical to the raw version.
+"""
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+
+# Initialize the model (same as OpenAI client, just wrapped)
+llm = ChatOpenAI(model="gpt-4o", temperature=0.3)
+parser = StrOutputParser()
+
+# ── STEP 1: Summarize Chain ───────────────────────
+summarize_prompt = ChatPromptTemplate.from_messages([
+    ("system", "You are a news summarizer. Create a clear 2-sentence summary."),
+    ("user", "Summarize this article:\n\n{article}")
+])
+# The pipe operator (|) chains: prompt → llm → parser
+summarize_chain = summarize_prompt | llm | parser
+
+# ── STEP 2: Classify Chain ────────────────────────
+classify_prompt = ChatPromptTemplate.from_messages([
+    ("system", "Classify into: Technology, Business, Science, Politics, Health, or Other. Respond with ONLY the category."),
+    ("user", "Classify: {summary}")
+])
+classify_chain = classify_prompt | llm | parser
+
+# ── STEP 3: Format Chain ─────────────────────────
+format_prompt = ChatPromptTemplate.from_messages([
+    ("system", "Format articles into a clean daily digest with category headers and intro."),
+    ("user", "Format this into a newsletter:\n{articles_text}")
+])
+format_chain = format_prompt | llm | parser
+
+# ── RUN THE PIPELINE ──────────────────────────────
+def run_pipeline(articles: list[str]) -> str:
+    """Same pipeline, but using LCEL chains.
+
+    Notice: The logic is IDENTICAL to the raw version.
+    LCEL just gives you cleaner syntax and built-in features.
+    """
+    classified = []
+
+    for article in articles:
+        # Chain invocation — .invoke() runs the full chain
+        summary = summarize_chain.invoke({"article": article})
+        category = classify_chain.invoke({"summary": summary})
+        classified.append({"summary": summary, "category": category})
+
+    articles_text = "\n".join(
+        f"{i}. [{a['category']}] {a['summary']}"
+        for i, a in enumerate(classified, 1)
+    )
+
+    return format_chain.invoke({"articles_text": articles_text})
+
+if __name__ == "__main__":
+    sample = [
+        "OpenAI announced GPT-5 with reasoning improvements...",
+        "Tesla Q4 earnings beat expectations...",
+        "CRISPR therapy shows promise for sickle cell..."
+    ]
+    print(run_pipeline(sample))
+</code></pre>
+            </div>
+        </div>
+
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-6">
+            <h3 class="font-bold text-amber-800 mb-2">🏋️ Stage 2 Project: Build Your Own News Digest Pipeline</h3>
+            <ul class="text-sm text-amber-900 space-y-1 list-disc list-inside">
+                <li>Fetch real articles (use <code>requests</code> + a news API or web scraping)</li>
+                <li>Build it raw first, then refactor to LCEL</li>
+                <li>Add a "tone" parameter (professional vs casual digest)</li>
+                <li>Bonus: Add error handling for API failures between steps</li>
+            </ul>
+        </div>
+
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-surface-100">
+            <h3 class="font-bold mb-3">✅ Stage 2 Checklist</h3>
+            <div class="space-y-2 text-sm">
+                <label class="flex items-center gap-2 cursor-pointer checklist-item"><input type="checkbox" class="rounded" onchange="updateProgress()"><span>Understand why decomposition beats monolithic calls</span></label>
+                <label class="flex items-center gap-2 cursor-pointer checklist-item"><input type="checkbox" class="rounded" onchange="updateProgress()"><span>Can build a multi-step pipeline with raw API calls</span></label>
+                <label class="flex items-center gap-2 cursor-pointer checklist-item"><input type="checkbox" class="rounded" onchange="updateProgress()"><span>Can use LCEL pipe operator for chaining</span></label>
+                <label class="flex items-center gap-2 cursor-pointer checklist-item"><input type="checkbox" class="rounded" onchange="updateProgress()"><span>Know the difference between pipeline and agent</span></label>
+                <label class="flex items-center gap-2 cursor-pointer checklist-item"><input type="checkbox" class="rounded" onchange="updateProgress()"><span>Built the news digest project</span></label>
+            </div>
+        </div>
+    </section>
+
+    <hr class="max-w-5xl mx-auto border-surface-200">
+
+    <!-- ============================================================ -->
+    <!--                  STAGE 3: TOOL USE                           -->
+    <!-- ============================================================ -->
+    <section id="stage3" class="py-20 px-8 max-w-5xl mx-auto">
+        <div class="flex items-center gap-4 mb-2">
+            <span class="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-full">WEEKS 5–6</span>
+            <label class="flex items-center gap-2 text-sm text-surface-500 cursor-pointer checklist-item">
+                <input type="checkbox" class="stage-check" data-stage="3" onchange="updateProgress()">
+                <span>Mark Complete</span>
+            </label>
+        </div>
+        <h2 class="text-4xl font-black mb-4">🔧 Stage 3: Tool Use & Function Calling</h2>
+        <p class="text-lg text-surface-600 mb-8 max-w-3xl">
+            This is where agents get real power. The LLM decides <em>which tool to call</em> and <em>with what arguments</em>. Your code executes it and returns results. <strong>The LLM is a smart dispatcher — it doesn't run code, it decides what to run.</strong>
+        </p>
+
+        <div class="grid md:grid-cols-3 gap-4 mb-10">
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-surface-100">
+                <div class="text-2xl mb-2">📋</div>
+                <h3 class="font-bold mb-1">JSON Schema</h3>
+                <p class="text-sm text-surface-600">Tools are defined as JSON schemas. The LLM reads the schema to understand what arguments to provide.</p>
+            </div>
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-surface-100">
+                <div class="text-2xl mb-2">🔁</div>
+                <h3 class="font-bold mb-1">The Loop</h3>
+                <p class="text-sm text-surface-600">Call LLM → it returns tool call → you execute → feed result back → LLM continues. This loop is the heartbeat of agents.</p>
+            </div>
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-surface-100">
+                <div class="text-2xl mb-2">🛡️</div>
+                <h3 class="font-bold mb-1">Safety</h3>
+                <p class="text-sm text-surface-600">YOU execute the tools, not the LLM. This means you control what's allowed — always validate before executing.</p>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-surface-100 overflow-hidden mb-8">
+            <div class="border-b border-surface-100 px-6 py-4">
+                <h3 class="font-bold text-lg">🔬 Tutorial: Function Calling from Scratch</h3>
+                <p class="text-sm text-surface-500">Build a research assistant that can search and calculate</p>
+            </div>
+            <div class="flex bg-surface-800 border-b border-surface-700">
+                <div class="code-tab active" onclick="switchTab(this, 's3-raw')">Raw Function Calling</div>
+                <div class="code-tab" onclick="switchTab(this, 's3-langchain')">LangChain Tools</div>
+            </div>
+            <div id="s3-raw" class="code-panel">
+<pre><code class="language-python">"""
+Stage 3 — Function Calling with OpenAI (Raw)
+WHY: This is the mechanism that gives agents real-world powers.
+     Understanding this loop is CRITICAL for building any agent.
+
+THE LOOP:
+  1. You send messages + tool definitions to the LLM
+  2. LLM returns a tool_call (name + arguments)
+  3. You execute the tool locally
+  4. You send the result back as a 'tool' message
+  5. LLM uses the result to form its final answer
+"""
+import os
+import json
+from openai import OpenAI
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+# ── DEFINE YOUR TOOLS ─────────────────────────────
+# Tools are Python functions that do real work
+def search_web(query: str) -> str:
+    """Simulate a web search (replace with Tavily/SerpAPI in production)."""
+    fake_results = {
+        "python list comprehension": "List comprehensions provide a concise way to create lists: [x**2 for x in range(10)]",
+        "langchain vs langgraph": "LangChain is for chains/pipelines, LangGraph adds stateful agent graphs with cycles.",
+    }
+    # Find a matching result (simple keyword match)
+    for key, value in fake_results.items():
+        if key in query.lower():
+            return value
+    return f"No results found for: {query}"
+
+def calculate(expression: str) -> str:
+    """Safely evaluate a math expression."""
+    try:
+        # SAFETY: only allow basic math operations
+        allowed_chars = set("0123456789+-*/().% ")
+        if not all(c in allowed_chars for c in expression):
+            return "Error: Only basic math operations are allowed"
+        result = eval(expression)  # Safe because we validated input
+        return str(result)
+    except Exception as e:
+        return f"Error: {e}"
+
+# ── TOOL DEFINITIONS (JSON Schema) ────────────────
+# This is what the LLM reads to understand available tools
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "search_web",
+            "description": "Search the web for information on any topic",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "The search query"
+                    }
+                },
+                "required": ["query"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "calculate",
+            "description": "Evaluate a mathematical expression",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "expression": {
+                        "type": "string",
+                        "description": "Math expression like '2 + 2' or '(10 * 5) / 3'"
+                    }
+                },
+                "required": ["expression"]
+            }
+        }
+    }
+]
+
+# Map of tool names to actual functions
+tool_functions = {
+    "search_web": search_web,
+    "calculate": calculate,
+}
+
+# ── THE AGENT LOOP ────────────────────────────────
+def run_agent(user_query: str) -> str:
+    """The core agent loop with tool use.
+
+    This is THE fundamental pattern. Every agent framework
+    implements some version of this loop.
+    """
+    messages = [
+        {"role": "system", "content": "You are a helpful research assistant. Use tools when needed to answer questions accurately."},
+        {"role": "user", "content": user_query}
+    ]
+
+    # Loop until the LLM gives a final answer (not a tool call)
+    while True:
+        # Step 1: Call the LLM with messages + available tools
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=messages,
+            tools=tools,
+            temperature=0.3
+        )
+
+        choice = response.choices[0]
+
+        # Step 2: Check if the LLM wants to use a tool
+        if choice.finish_reason == "tool_calls":
+            # The LLM chose to call one or more tools
+            assistant_message = choice.message
+            messages.append(assistant_message)  # Add to history
+
+            # Step 3: Execute each tool call
+            for tool_call in assistant_message.tool_calls:
+                func_name = tool_call.function.name
+                func_args = json.loads(tool_call.function.arguments)
+
+                print(f"  🔧 Calling: {func_name}({func_args})")
+
+                # Execute the tool
+                result = tool_functions[func_name](**func_args)
+
+                print(f"  📋 Result: {result[:100]}...")
+
+                # Step 4: Send the result back to the LLM
+                messages.append({
+                    "role": "tool",
+                    "tool_call_id": tool_call.id,
+                    "content": result
+                })
+        else:
+            # No tool call — LLM gave its final answer
+            return choice.message.content
+
+# ── EXAMPLE USAGE ─────────────────────────────────
+if __name__ == "__main__":
+    queries = [
+        "What is the difference between LangChain and LangGraph?",
+        "What is 15% of 2847?",
+        "Search for Python list comprehension and calculate 2**10",
+    ]
+
+    for q in queries:
+        print(f"\n❓ Query: {q}")
+        answer = run_agent(q)
+        print(f"✅ Answer: {answer}\n")
+        print("-" * 60)
+</code></pre>
+            </div>
+            <div id="s3-langchain" class="code-panel" style="display:none">
+<pre><code class="language-python">"""
+Stage 3 — Tool Use with LangChain
+WHY: LangChain's @tool decorator + AgentExecutor handles the
+     entire loop for you. Compare with the raw version to see
+     exactly what it abstracts.
+"""
+from langchain_openai import ChatOpenAI
+from langchain_core.tools import tool
+from langchain.agents import AgentExecutor, create_tool_calling_agent
+from langchain_core.prompts import ChatPromptTemplate
+
+# ── DEFINE TOOLS (much simpler with @tool) ────────
+@tool
+def search_web(query: str) -> str:
+    """Search the web for information on any topic."""
+    # In production, use TavilySearchResults or SerpAPIWrapper
+    fake_results = {
+        "python list comprehension": "List comprehensions: [x**2 for x in range(10)]",
+        "langchain vs langgraph": "LangChain = chains, LangGraph = stateful graphs.",
+    }
+    for key, value in fake_results.items():
+        if key in query.lower():
+            return value
+    return f"No results found for: {query}"
+
+@tool
+def calculate(expression: str) -> str:
+    """Evaluate a mathematical expression like '2 + 2' or '(10 * 5) / 3'."""
+    try:
+        allowed = set("0123456789+-*/().% ")
+        if not all(c in allowed for c in expression):
+            return "Error: Only basic math operations allowed"
+        return str(eval(expression))
+    except Exception as e:
+        return f"Error: {e}"
+
+# ── BUILD THE AGENT ───────────────────────────────
+llm = ChatOpenAI(model="gpt-4o", temperature=0.3)
+tools_list = [search_web, calculate]
+
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "You are a helpful research assistant. Use tools when needed."),
+    ("placeholder", "{chat_history}"),
+    ("user", "{input}"),
+    ("placeholder", "{agent_scratchpad}"),  # Where tool results go
+])
+
+# create_tool_calling_agent builds the agent logic
+# AgentExecutor runs the loop (same loop we built manually!)
+agent = create_tool_calling_agent(llm, tools_list, prompt)
+executor = AgentExecutor(agent=agent, tools=tools_list, verbose=True)
+
+# ── RUN IT ────────────────────────────────────────
+if __name__ == "__main__":
+    # verbose=True shows you the exact same loop happening
+    result = executor.invoke({
+        "input": "Search for info about LangChain vs LangGraph, then calculate 2**16",
+        "chat_history": []
+    })
+    print(f"\n✅ Final Answer: {result['output']}")
+</code></pre>
+            </div>
+        </div>
+
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-6">
+            <h3 class="font-bold text-amber-800 mb-2">🏋️ Stage 3 Project: Research Assistant with Real Tools</h3>
+            <ul class="text-sm text-amber-900 space-y-1 list-disc list-inside">
+                <li>Add Tavily search (<code>pip install tavily-python</code>) for real web search</li>
+                <li>Add a URL reader tool that fetches and summarizes web pages</li>
+                <li>Build it raw first, then refactor to LangChain</li>
+                <li>Bonus: Add a "save notes" tool that writes findings to a file</li>
+            </ul>
+        </div>
+
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-surface-100">
+            <h3 class="font-bold mb-3">✅ Stage 3 Checklist</h3>
+            <div class="space-y-2 text-sm">
+                <label class="flex items-center gap-2 cursor-pointer checklist-item"><input type="checkbox" class="rounded" onchange="updateProgress()"><span>Understand the tool call → execute → return loop</span></label>
+                <label class="flex items-center gap-2 cursor-pointer checklist-item"><input type="checkbox" class="rounded" onchange="updateProgress()"><span>Can define tools as JSON schemas</span></label>
+                <label class="flex items-center gap-2 cursor-pointer checklist-item"><input type="checkbox" class="rounded" onchange="updateProgress()"><span>Can use LangChain @tool decorator</span></label>
+                <label class="flex items-center gap-2 cursor-pointer checklist-item"><input type="checkbox" class="rounded" onchange="updateProgress()"><span>Understand safety implications (you control execution)</span></label>
+                <label class="flex items-center gap-2 cursor-pointer checklist-item"><input type="checkbox" class="rounded" onchange="updateProgress()"><span>Built the research assistant project</span></label>
+            </div>
+        </div>
+    </section>
+
+    <hr class="max-w-5xl mx-auto border-surface-200">
+
+    <!-- ============================================================ -->
+    <!--                  STAGE 4: MEMORY                             -->
+    <!-- ============================================================ -->
+    <section id="stage4" class="py-20 px-8 max-w-5xl mx-auto">
+        <div class="flex items-center gap-4 mb-2">
+            <span class="px-3 py-1 bg-rose-100 text-rose-700 text-xs font-bold rounded-full">WEEK 7</span>
+            <label class="flex items-center gap-2 text-sm text-surface-500 cursor-pointer checklist-item">
+                <input type="checkbox" class="stage-check" data-stage="4" onchange="updateProgress()">
+                <span>Mark Complete</span>
+            </label>
+        </div>
+        <h2 class="text-4xl font-black mb-4">🧠 Stage 4: Memory & State</h2>
+        <p class="text-lg text-surface-600 mb-8 max-w-3xl">
+            A stateless agent forgets everything after each call. Real agents need memory. There are four types — and knowing when to use each one is key.
+        </p>
+
+        <div class="grid md:grid-cols-2 gap-4 mb-10">
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-surface-100">
+                <div class="text-2xl mb-2">💬</div>
+                <h3 class="font-bold mb-1">In-Context Memory</h3>
+                <p class="text-sm text-surface-600">Just keep the full conversation in the messages array. Simple, but limited by token window. Good for short sessions.</p>
+            </div>
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-surface-100">
+                <div class="text-2xl mb-2">📝</div>
+                <h3 class="font-bold mb-1">Summary Memory</h3>
+                <p class="text-sm text-surface-600">Periodically compress old messages into a summary. Saves tokens while retaining key context. Great for long conversations.</p>
+            </div>
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-surface-100">
+                <div class="text-2xl mb-2">🔍</div>
+                <h3 class="font-bold mb-1">Vector/External Memory</h3>
+                <p class="text-sm text-surface-600">Store facts in a vector DB (ChromaDB). Retrieve relevant ones at query time. This is RAG — essential for knowledge-heavy agents.</p>
+            </div>
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-surface-100">
+                <div class="text-2xl mb-2">👤</div>
+                <h3 class="font-bold mb-1">Entity Memory</h3>
+                <p class="text-sm text-surface-600">Track specific entities (people, projects, preferences). Like a mini-database the agent updates as it learns about the user.</p>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-surface-100 overflow-hidden mb-8">
+            <div class="border-b border-surface-100 px-6 py-4">
+                <h3 class="font-bold text-lg">🔬 Tutorial: All Four Memory Types</h3>
+            </div>
+            <div class="flex bg-surface-800 border-b border-surface-700 flex-wrap">
+                <div class="code-tab active" onclick="switchTab(this, 's4-context')">In-Context</div>
+                <div class="code-tab" onclick="switchTab(this, 's4-summary')">Summary</div>
+                <div class="code-tab" onclick="switchTab(this, 's4-vector')">Vector/RAG</div>
+            </div>
+            <div id="s4-context" class="code-panel">
+<pre><code class="language-python">"""
+Stage 4A — In-Context Memory (Simplest Form)
+WHY: This is what you already did in Stage 1! The messages list IS memory.
+     But it grows forever and eventually hits the token limit.
+"""
+from openai import OpenAI
+client = OpenAI()
+
+class InContextMemoryBot:
+    """A bot that remembers by keeping all messages.
+
+    TRADEOFF: Perfect recall, but costs grow with every message
+    (you pay per token, and there's a max context window).
+    """
+    def __init__(self, system_prompt: str):
+        self.messages = [{"role": "system", "content": system_prompt}]
+
+    def chat(self, user_input: str) -> str:
+        self.messages.append({"role": "user", "content": user_input})
+
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=self.messages,  # Send ALL history every time
+            temperature=0.7
+        )
+        reply = response.choices[0].message.content
+        self.messages.append({"role": "assistant", "content": reply})
+
+        # Show memory size (educational)
+        token_estimate = sum(len(m["content"]) // 4 for m in self.messages)
+        print(f"  [Memory: {len(self.messages)} msgs, ~{token_estimate} tokens]")
+
+        return reply
+
+# Usage
+bot = InContextMemoryBot("You are a friendly tutor. Remember the student's name and preferences.")
+print(bot.chat("Hi, I'm Ram and I love Python!"))
+print(bot.chat("What's my name?"))  # It remembers!
+print(bot.chat("What language do I like?"))  # Still remembers!
+</code></pre>
+            </div>
+            <div id="s4-summary" class="code-panel" style="display:none">
+<pre><code class="language-python">"""
+Stage 4B — Summary Memory
+WHY: When conversations get long, compress old messages into
+     a summary to save tokens while keeping key context.
+
+     Think of it like: you don't remember every word of a meeting,
+     but you remember the key decisions.
+"""
+from openai import OpenAI
+client = OpenAI()
+
+class SummaryMemoryBot:
+    """Compresses old messages into a running summary."""
+
+    def __init__(self, system_prompt: str, max_messages: int = 10):
+        self.system_prompt = system_prompt
+        self.max_messages = max_messages  # Compress after this many
+        self.messages = []
+        self.summary = ""  # Running summary of older messages
+
+    def _compress_memory(self):
+        """Compress older messages into a summary."""
+        # Take the oldest messages (keep recent ones for detail)
+        old_messages = self.messages[:-4]  # Keep last 4 messages intact
+        recent_messages = self.messages[-4:]
+
+        # Ask the LLM to summarize the old conversation
+        summary_prompt = f"""Summarize this conversation concisely,
+preserving key facts, names, preferences, and decisions:
+
+Previous summary: {self.summary}
+
+Messages to compress:
+{chr(10).join(f"{m['role']}: {m['content']}" for m in old_messages)}"""
+
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[{"role": "user", "content": summary_prompt}],
+            temperature=0.3,
+            max_tokens=300
+        )
+
+        self.summary = response.choices[0].message.content
+        self.messages = recent_messages
+        print(f"  [🗜️ Compressed! Summary: {self.summary[:80]}...]")
+
+    def chat(self, user_input: str) -> str:
+        self.messages.append({"role": "user", "content": user_input})
+
+        # Build the full context with summary + recent messages
+        full_messages = [
+            {"role": "system", "content": self.system_prompt}
+        ]
+
+        if self.summary:
+            full_messages.append({
+                "role": "system",
+                "content": f"Summary of earlier conversation: {self.summary}"
+            })
+
+        full_messages.extend(self.messages)
+
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=full_messages,
+            temperature=0.7
+        )
+        reply = response.choices[0].message.content
+        self.messages.append({"role": "assistant", "content": reply})
+
+        # Compress if we have too many messages
+        if len(self.messages) > self.max_messages:
+            self._compress_memory()
+
+        return reply
+</code></pre>
+            </div>
+            <div id="s4-vector" class="code-panel" style="display:none">
+<pre><code class="language-python">"""
+Stage 4C — Vector Memory (RAG Pattern)
+WHY: This is the foundation of RAG. Store knowledge as vectors,
+     retrieve relevant pieces at query time. Essential for
+     knowledge-heavy agents.
+
+ANALOGY: Like a librarian who finds relevant books for you
+         instead of reading every book in the library.
+"""
+# pip install chromadb openai
+import chromadb
+from openai import OpenAI
+
+client = OpenAI()
+
+class VectorMemoryBot:
+    """A bot with long-term memory powered by vector search."""
+
+    def __init__(self, system_prompt: str):
+        self.system_prompt = system_prompt
+        self.messages = []
+
+        # ChromaDB stores vectors locally (no server needed)
+        self.chroma = chromadb.Client()
+        self.collection = self.chroma.create_collection(
+            name="agent_memory",
+            metadata={"hnsw:space": "cosine"}  # Similarity metric
+        )
+        self.memory_count = 0
+
+    def store_memory(self, text: str, metadata: dict = None):
+        """Store a fact in vector memory.
+
+        ChromaDB automatically converts text → vector embedding
+        and stores it for fast similarity search.
+        """
+        self.memory_count += 1
+        self.collection.add(
+            documents=[text],
+            metadatas=[metadata or {"type": "fact"}],
+            ids=[f"mem_{self.memory_count}"]
+        )
+        print(f"  [💾 Stored memory #{self.memory_count}: {text[:50]}...]")
+
+    def recall_memories(self, query: str, n_results: int = 3) -> list[str]:
+        """Find memories relevant to the current query.
+
+        This is the R in RAG — Retrieval. It finds the most
+        semantically similar stored memories.
+        """
+        if self.memory_count == 0:
+            return []
+
+        results = self.collection.query(
+            query_texts=[query],
+            n_results=min(n_results, self.memory_count)
+        )
+        memories = results["documents"][0] if results["documents"] else []
+        if memories:
+            print(f"  [🔍 Recalled {len(memories)} relevant memories]")
+        return memories
+
+    def chat(self, user_input: str) -> str:
+        # Retrieve relevant memories
+        memories = self.recall_memories(user_input)
+
+        # Build context with retrieved memories
+        context = ""
+        if memories:
+            context = "Relevant memories:\n" + "\n".join(f"- {m}" for m in memories)
+
+        messages = [
+            {"role": "system", "content": f"{self.system_prompt}\n\n{context}"},
+            *self.messages[-6:],  # Keep recent conversation
+            {"role": "user", "content": user_input}
+        ]
+
+        response = client.chat.completions.create(
+            model="gpt-4o", messages=messages, temperature=0.7
+        )
+        reply = response.choices[0].message.content
+
+        self.messages.append({"role": "user", "content": user_input})
+        self.messages.append({"role": "assistant", "content": reply})
+
+        # Store this exchange as a memory for future recall
+        self.store_memory(f"User said: {user_input}. Assistant replied about: {reply[:100]}")
+
+        return reply
+
+# ── EXAMPLE ───────────────────────────────────────
+if __name__ == "__main__":
+    bot = VectorMemoryBot("You are Ram's AI assistant with long-term memory.")
+
+    # Store some initial knowledge
+    bot.store_memory("Ram is learning AI/ML and loves Python")
+    bot.store_memory("Ram's favorite framework is LangChain")
+    bot.store_memory("Ram is building agentic workflows")
+
+    # Now chat — the bot recalls relevant memories automatically
+    print(bot.chat("What frameworks should I learn next?"))
+    # ^ It will recall the LangChain and agentic workflow memories!
+</code></pre>
+            </div>
+        </div>
+
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-6">
+            <h3 class="font-bold text-amber-800 mb-2">🏋️ Stage 4 Project: Research Assistant with Memory</h3>
+            <ul class="text-sm text-amber-900 space-y-1 list-disc list-inside">
+                <li>Extend your Stage 3 research assistant with ChromaDB vector memory</li>
+                <li>Store research findings and recall them in future sessions</li>
+                <li>Add summary memory for long conversations</li>
+                <li>Bonus: Persist memories to disk so they survive restarts</li>
+            </ul>
+        </div>
+
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-surface-100">
+            <h3 class="font-bold mb-3">✅ Stage 4 Checklist</h3>
+            <div class="space-y-2 text-sm">
+                <label class="flex items-center gap-2 cursor-pointer checklist-item"><input type="checkbox" class="rounded" onchange="updateProgress()"><span>Understand all 4 memory types and when to use each</span></label>
+                <label class="flex items-center gap-2 cursor-pointer checklist-item"><input type="checkbox" class="rounded" onchange="updateProgress()"><span>Can implement vector memory with ChromaDB</span></label>
+                <label class="flex items-center gap-2 cursor-pointer checklist-item"><input type="checkbox" class="rounded" onchange="updateProgress()"><span>Understand the RAG pattern (Retrieve → Augment → Generate)</span></label>
+                <label class="flex items-center gap-2 cursor-pointer checklist-item"><input type="checkbox" class="rounded" onchange="updateProgress()"><span>Can implement summary memory for long conversations</span></label>
+                <label class="flex items-center gap-2 cursor-pointer checklist-item"><input type="checkbox" class="rounded" onchange="updateProgress()"><span>Built the memory-enhanced research assistant</span></label>
+            </div>
+        </div>
+    </section>
+
+    <hr class="max-w-5xl mx-auto border-surface-200">
+
+    <!-- ============================================================ -->
+    <!--                  STAGE 5: REACT AGENTS                       -->
+    <!-- ============================================================ -->
+    <section id="stage5" class="py-20 px-8 max-w-5xl mx-auto">
+        <div class="flex items-center gap-4 mb-2">
+            <span class="px-3 py-1 bg-orange-100 text-orange-700 text-xs font-bold rounded-full">WEEKS 8–9</span>
+            <label class="flex items-center gap-2 text-sm text-surface-500 cursor-pointer checklist-item">
+                <input type="checkbox" class="stage-check" data-stage="5" onchange="updateProgress()">
+                <span>Mark Complete</span>
+            </label>
+        </div>
+        <h2 class="text-4xl font-black mb-4">🔄 Stage 5: The ReAct Loop</h2>
+        <p class="text-lg text-surface-600 mb-8 max-w-3xl">
+            <strong>ReAct = Reason + Act.</strong> The agent thinks about what to do, takes an action, observes the result, and repeats. Unlike pipelines, the agent <em>decides its own path</em>. This is what separates agents from pipelines.
+        </p>
+
+        <!-- ReAct Diagram -->
+        <div class="bg-surface-900 text-white rounded-xl p-8 mb-10 font-mono text-sm">
+            <div class="text-center mb-4 text-brand-300 font-bold text-lg font-sans">The ReAct Loop</div>
+<pre class="text-center text-green-300">
+┌──────────────────────────────────────────┐
+│              USER QUESTION               │
+└─────────────────┬────────────────────────┘
+                  ▼
+         ┌────────────────┐
+    ┌───→│    THOUGHT     │ ← "I need to search for X"
+    │    │   (Reasoning)  │
+    │    └───────┬────────┘
+    │            ▼
+    │    ┌────────────────┐
+    │    │    ACTION       │ ← Calls search_web("X")
+    │    │  (Tool Call)   │
+    │    └───────┬────────┘
+    │            ▼
+    │    ┌────────────────┐
+    │    │  OBSERVATION   │ ← Gets search results
+    │    │ (Tool Result)  │
+    │    └───────┬────────┘
+    │            ▼
+    │      ┌──────────┐
+    │      │ Done?    │──── YES ───→ FINAL ANSWER
+    │      └────┬─────┘
+    │           │ NO
+    └───────────┘
+</pre>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-surface-100 overflow-hidden mb-8">
+            <div class="border-b border-surface-100 px-6 py-4">
+                <h3 class="font-bold text-lg">🔬 Tutorial: Autonomous Research Agent</h3>
+                <p class="text-sm text-surface-500">An agent that breaks down questions, researches sub-topics, and synthesizes findings</p>
+            </div>
+            <div class="flex bg-surface-800 border-b border-surface-700">
+                <div class="code-tab active" onclick="switchTab(this, 's5-react')">ReAct Agent (Raw)</div>
+                <div class="code-tab" onclick="switchTab(this, 's5-langgraph')">LangGraph Version</div>
+            </div>
+            <div id="s5-react" class="code-panel">
+<pre><code class="language-python">"""
+Stage 5 — ReAct Agent from Scratch
+WHY: This is the CORE agent pattern. Every sophisticated agent
+     (AutoGPT, BabyAGI, Claude, etc.) uses some variant of this loop.
+
+KEY DIFFERENCE FROM STAGE 3:
+  Stage 3: LLM calls tools, gets result, gives answer (1 cycle)
+  Stage 5: LLM LOOPS — think → act → observe → think again → ...
+           It decides WHEN it has enough info to stop.
+"""
+import os
+import json
+from openai import OpenAI
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+# ── TOOLS ─────────────────────────────────────────
+def search_web(query: str) -> str:
+    """Simulate web search."""
+    results = {
+        "react pattern llm": "ReAct (Yao et al., 2022) combines reasoning and acting in LLMs. The agent generates reasoning traces AND task-specific actions in an interleaved manner.",
+        "langgraph agents": "LangGraph enables building stateful, multi-actor applications. It adds cycles, controllability, and persistence to LangChain.",
+        "agent memory types": "Four types: in-context (messages), summary (compressed), vector (RAG), entity (structured facts about entities).",
+        "multi-agent systems": "Systems where multiple specialized agents collaborate. Examples: CrewAI, AutoGen, LangGraph multi-agent.",
+    }
+    for key, val in results.items():
+        if any(word in query.lower() for word in key.split()):
+            return val
+    return f"Search results for '{query}': General information about {query}..."
+
+def take_notes(note: str) -> str:
+    """Save a research note."""
+    print(f"  📝 Note saved: {note[:80]}...")
+    return f"Note saved: {note}"
+
+def write_report(content: str) -> str:
+    """Write the final research report."""
+    return f"Report written:\n{content}"
+
+tools = [
+    {"type": "function", "function": {"name": "search_web", "description": "Search for information", "parameters": {"type": "object", "properties": {"query": {"type": "string"}}, "required": ["query"]}}},
+    {"type": "function", "function": {"name": "take_notes", "description": "Save a research note for later synthesis", "parameters": {"type": "object", "properties": {"note": {"type": "string"}}, "required": ["note"]}}},
+    {"type": "function", "function": {"name": "write_report", "description": "Write the final synthesized report", "parameters": {"type": "object", "properties": {"content": {"type": "string"}}, "required": ["content"]}}},
+]
+tool_map = {"search_web": search_web, "take_notes": take_notes, "write_report": write_report}
+
+# ── THE REACT AGENT ───────────────────────────────
+def react_agent(question: str, max_iterations: int = 10) -> str:
+    """A ReAct agent that autonomously researches and reports.
+
+    IMPORTANT: max_iterations prevents infinite loops.
+    A well-designed agent always has a safety limit.
+    """
+    system = """You are an autonomous research agent. Given a question:
+1. Break it into sub-questions
+2. Research each sub-question using search_web
+3. Save key findings using take_notes
+4. When you have enough info, use write_report to create a synthesis
+
+Think step by step. After each action, reflect on what you learned
+and decide what to do next. Stop when you have a comprehensive answer."""
+
+    messages = [
+        {"role": "system", "content": system},
+        {"role": "user", "content": f"Research this topic thoroughly: {question}"}
+    ]
+
+    for iteration in range(max_iterations):
+        print(f"\n🔄 Iteration {iteration + 1}/{max_iterations}")
+
+        response = client.chat.completions.create(
+            model="gpt-4o", messages=messages, tools=tools, temperature=0.3
+        )
+
+        choice = response.choices[0]
+
+        # If the agent is done (no more tool calls)
+        if choice.finish_reason == "stop":
+            print("✅ Agent finished reasoning!")
+            return choice.message.content
+
+        if choice.finish_reason == "tool_calls":
+            messages.append(choice.message)
+
+            for tc in choice.message.tool_calls:
+                name = tc.function.name
+                args = json.loads(tc.function.arguments)
+
+                print(f"  💭 Action: {name}({list(args.values())[0][:60]}...)")
+
+                result = tool_map[name](**args)
+
+                messages.append({
+                    "role": "tool",
+                    "tool_call_id": tc.id,
+                    "content": result
+                })
+
+                # If write_report was called, we're done
+                if name == "write_report":
+                    print("📄 Report generated!")
+                    return result
+
+    return "⚠️ Max iterations reached. Partial findings in notes."
+
+# ── RUN ───────────────────────────────────────────
+if __name__ == "__main__":
+    report = react_agent(
+        "What are the key patterns for building AI agents? "
+        "Cover ReAct, tool use, memory, and multi-agent systems."
+    )
+    print("\n" + "=" * 60)
+    print(report)
+</code></pre>
+            </div>
+            <div id="s5-langgraph" class="code-panel" style="display:none">
+<pre><code class="language-python">"""
+Stage 5 — ReAct Agent with LangGraph
+WHY: LangGraph gives you explicit control over the agent loop
+     as a graph. Nodes = actions, Edges = decisions.
+     Much easier to debug and extend than raw loops.
+"""
+# pip install langgraph langchain-openai
+from typing import Annotated, TypedDict
+from langchain_openai import ChatOpenAI
+from langchain_core.tools import tool
+from langchain_core.messages import HumanMessage
+from langgraph.graph import StateGraph, END
+from langgraph.graph.message import add_messages
+from langgraph.prebuilt import ToolNode
+
+# ── STATE: What the agent remembers between steps ─
+class AgentState(TypedDict):
+    """The agent's state — passed between all nodes.
+
+    'messages' uses add_messages which appends (not replaces).
+    This is how the conversation history grows.
+    """
+    messages: Annotated[list, add_messages]
+
+# ── TOOLS ─────────────────────────────────────────
+@tool
+def search_web(query: str) -> str:
+    """Search the web for information on any topic."""
+    results = {
+        "react pattern": "ReAct combines reasoning + acting in an interleaved loop.",
+        "langgraph": "LangGraph builds stateful agent graphs with cycles.",
+        "agent memory": "Four types: in-context, summary, vector, entity.",
+    }
+    for key, val in results.items():
+        if any(w in query.lower() for w in key.split()):
+            return val
+    return f"Info about {query}: ..."
+
+@tool
+def take_notes(note: str) -> str:
+    """Save a research note for synthesis."""
+    return f"Saved: {note}"
+
+tools = [search_web, take_notes]
+
+# ── AGENT NODE: Decides what to do ────────────────
+llm = ChatOpenAI(model="gpt-4o", temperature=0.3).bind_tools(tools)
+
+def agent_node(state: AgentState) -> dict:
+    """The 'brain' — calls the LLM to decide the next action."""
+    response = llm.invoke(state["messages"])
+    return {"messages": [response]}
+
+# ── TOOL NODE: Executes tool calls ────────────────
+tool_node = ToolNode(tools)
+
+# ── ROUTER: Should we continue or stop? ───────────
+def should_continue(state: AgentState) -> str:
+    """Check if the agent wants to use more tools or is done."""
+    last_message = state["messages"][-1]
+    if last_message.tool_calls:
+        return "tools"  # Agent wants to use a tool
+    return END  # Agent is done, exit the loop
+
+# ── BUILD THE GRAPH ───────────────────────────────
+graph = StateGraph(AgentState)
+
+# Add nodes
+graph.add_node("agent", agent_node)    # The thinking node
+graph.add_node("tools", tool_node)     # The execution node
+
+# Add edges (this defines the ReAct loop!)
+graph.set_entry_point("agent")         # Start with thinking
+graph.add_conditional_edges(           # After thinking...
+    "agent",
+    should_continue,                   # ...check if we need tools
+    {"tools": "tools", END: END}       # ...route accordingly
+)
+graph.add_edge("tools", "agent")       # After tools → think again
+
+# Compile the graph into a runnable agent
+agent = graph.compile()
+
+# ── RUN ───────────────────────────────────────────
+if __name__ == "__main__":
+    result = agent.invoke({
+        "messages": [HumanMessage(
+            content="Research the key patterns for building AI agents"
+        )]
+    })
+
+    # Print the final message
+    print(result["messages"][-1].content)
+</code></pre>
+            </div>
+        </div>
+
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-6">
+            <h3 class="font-bold text-amber-800 mb-2">🏋️ Stage 5 Project: Autonomous Research Agent</h3>
+            <ul class="text-sm text-amber-900 space-y-1 list-disc list-inside">
+                <li>Build with LangGraph — define the graph with agent + tool nodes</li>
+                <li>Add real web search (Tavily) and URL reading tools</li>
+                <li>Add memory from Stage 4 so it remembers past research</li>
+                <li>Bonus: Add a "planning" node that creates sub-questions first</li>
+            </ul>
+        </div>
+
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-surface-100">
+            <h3 class="font-bold mb-3">✅ Stage 5 Checklist</h3>
+            <div class="space-y-2 text-sm">
+                <label class="flex items-center gap-2 cursor-pointer checklist-item"><input type="checkbox" class="rounded" onchange="updateProgress()"><span>Understand the ReAct (Reason + Act) loop</span></label>
+                <label class="flex items-center gap-2 cursor-pointer checklist-item"><input type="checkbox" class="rounded" onchange="updateProgress()"><span>Can build a ReAct agent from scratch with raw API</span></label>
+                <label class="flex items-center gap-2 cursor-pointer checklist-item"><input type="checkbox" class="rounded" onchange="updateProgress()"><span>Can build agent graphs with LangGraph</span></label>
+                <label class="flex items-center gap-2 cursor-pointer checklist-item"><input type="checkbox" class="rounded" onchange="updateProgress()"><span>Know when to use agents vs pipelines</span></label>
+                <label class="flex items-center gap-2 cursor-pointer checklist-item"><input type="checkbox" class="rounded" onchange="updateProgress()"><span>Built the autonomous research agent</span></label>
+            </div>
+        </div>
+    </section>
+
+    <hr class="max-w-5xl mx-auto border-surface-200">
+
+    <!-- ============================================================ -->
+    <!--                  STAGE 6: MULTI-AGENT                        -->
+    <!-- ============================================================ -->
+    <section id="stage6" class="py-20 px-8 max-w-5xl mx-auto">
+        <div class="flex items-center gap-4 mb-2">
+            <span class="px-3 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full">WEEKS 10–12</span>
+            <label class="flex items-center gap-2 text-sm text-surface-500 cursor-pointer checklist-item">
+                <input type="checkbox" class="stage-check" data-stage="6" onchange="updateProgress()">
+                <span>Mark Complete</span>
+            </label>
+        </div>
+        <h2 class="text-4xl font-black mb-4">👥 Stage 6: Multi-Agent Systems</h2>
+        <p class="text-lg text-surface-600 mb-8 max-w-3xl">
+            Instead of one agent doing everything, orchestrate a <strong>team of specialized agents</strong>. A supervisor delegates, workers execute, and results are aggregated — just like a human team.
+        </p>
+
+        <!-- Architecture Diagram -->
+        <div class="bg-surface-900 text-white rounded-xl p-8 mb-10 font-mono text-sm">
+            <div class="text-center mb-4 text-brand-300 font-bold text-lg font-sans">Multi-Agent Architecture</div>
+<pre class="text-center text-yellow-300">
+                    ┌─────────────────┐
+                    │   SUPERVISOR    │
+                    │  (Orchestrator) │
+                    └──┬─────┬─────┬──┘
+                 ┌─────┘     │     └─────┐
+                 ▼           ▼           ▼
+          ┌────────────┐ ┌────────┐ ┌────────────┐
+          │ RESEARCHER │ │ WRITER │ │  REVIEWER  │
+          │   Agent    │ │ Agent  │ │   Agent    │
+          │            │ │        │ │            │
+          │ - search   │ │ - draft│ │ - critique │
+          │ - analyze  │ │ - edit │ │ - score    │
+          │ - summarize│ │ - tone │ │ - suggest  │
+          └────────────┘ └────────┘ └────────────┘
+</pre>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-surface-100 overflow-hidden mb-8">
+            <div class="border-b border-surface-100 px-6 py-4">
+                <h3 class="font-bold text-lg">🔬 Tutorial: Content Creation Multi-Agent System</h3>
+                <p class="text-sm text-surface-500">Supervisor + Researcher + Writer + Reviewer working as a team</p>
+            </div>
+            <div class="flex bg-surface-800 border-b border-surface-700">
+                <div class="code-tab active" onclick="switchTab(this, 's6-raw')">Raw Multi-Agent</div>
+                <div class="code-tab" onclick="switchTab(this, 's6-langgraph')">LangGraph Multi-Agent</div>
+            </div>
+            <div id="s6-raw" class="code-panel">
+<pre><code class="language-python">"""
+Stage 6 — Multi-Agent System (Raw Implementation)
+WHY: Build it raw first to understand the orchestration pattern.
+     Then you'll appreciate what LangGraph/CrewAI automate.
+
+ARCHITECTURE:
+  Supervisor → decides which agent to call next
+  Researcher → gathers information
+  Writer     → creates content from research
+  Reviewer   → critiques and scores the content
+"""
+import os
+import json
+from openai import OpenAI
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+def call_agent(system_prompt: str, task: str, temperature: float = 0.5) -> str:
+    """Call a specialized agent (each is just an LLM with a focused role)."""
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": task}
+        ],
+        temperature=temperature
+    )
+    return response.choices[0].message.content
+
+# ── SPECIALIZED AGENTS ────────────────────────────
+class ResearcherAgent:
+    """Gathers and analyzes information on a topic."""
+    SYSTEM = """You are a research specialist. Your job is to:
+    1. Identify key subtopics to research
+    2. Gather comprehensive information
+    3. Return structured research notes
+
+    Format your output as:
+    ## Key Findings
+    - finding 1
+    - finding 2
+    ## Sources & Details
+    - detailed info..."""
+
+    def run(self, topic: str) -> str:
+        print("  🔬 Researcher agent working...")
+        return call_agent(self.SYSTEM, f"Research this topic thoroughly: {topic}")
+
+class WriterAgent:
+    """Creates polished content from research notes."""
+    SYSTEM = """You are an expert content writer. Your job is to:
+    1. Take research notes and turn them into engaging content
+    2. Use clear, concise language
+    3. Add a compelling introduction and conclusion
+    4. Format with headers, bullet points, and emphasis
+
+    Write in a professional but accessible tone."""
+
+    def run(self, research: str, format_type: str = "article") -> str:
+        print("  ✍️  Writer agent working...")
+        return call_agent(
+            self.SYSTEM,
+            f"Write a {format_type} based on this research:\n\n{research}"
+        )
+
+class ReviewerAgent:
+    """Critiques content and provides improvement suggestions."""
+    SYSTEM = """You are an editorial reviewer. Score and critique content.
+
+    Provide your review in this JSON format:
+    {
+        "score": 1-10,
+        "strengths": ["..."],
+        "weaknesses": ["..."],
+        "suggestions": ["..."],
+        "verdict": "approve" or "revise"
+    }"""
+
+    def run(self, content: str) -> dict:
+        print("  🔍 Reviewer agent working...")
+        review = call_agent(self.SYSTEM, f"Review this content:\n\n{content}", temperature=0.3)
+        try:
+            return json.loads(review)
+        except json.JSONDecodeError:
+            return {"score": 5, "verdict": "approve", "suggestions": [review]}
+
+# ── SUPERVISOR (Orchestrator) ─────────────────────
+class SupervisorAgent:
+    """Coordinates the team of agents.
+
+    This is the key pattern: the supervisor decides:
+    1. What order to call agents
+    2. Whether to loop (e.g., revise if review fails)
+    3. When the task is complete
+    """
+    def __init__(self, max_revisions: int = 2):
+        self.researcher = ResearcherAgent()
+        self.writer = WriterAgent()
+        self.reviewer = ReviewerAgent()
+        self.max_revisions = max_revisions
+
+    def run(self, topic: str) -> dict:
+        print(f"👔 Supervisor: Starting content creation for '{topic}'")
+        print("=" * 60)
+
+        # Step 1: Research
+        print("\n📋 Phase 1: Research")
+        research = self.researcher.run(topic)
+        print(f"  ✅ Research complete ({len(research)} chars)")
+
+        # Step 2: Write initial draft
+        print("\n📋 Phase 2: Writing")
+        content = self.writer.run(research)
+        print(f"  ✅ Draft complete ({len(content)} chars)")
+
+        # Step 3: Review loop (may iterate)
+        for revision in range(self.max_revisions):
+            print(f"\n📋 Phase 3: Review (attempt {revision + 1})")
+            review = self.reviewer.run(content)
+
+            score = review.get("score", 0)
+            verdict = review.get("verdict", "revise")
+            print(f"  📊 Score: {score}/10 | Verdict: {verdict}")
+
+            if verdict == "approve" or score >= 8:
+                print("  ✅ Content approved!")
+                break
+
+            # Revise based on feedback
+            print("  🔄 Revising based on feedback...")
+            suggestions = review.get("suggestions", [])
+            content = self.writer.run(
+                f"Original content:\n{content}\n\n"
+                f"Reviewer feedback:\n{chr(10).join(suggestions)}\n\n"
+                f"Please revise the content to address this feedback."
+            )
+
+        return {
+            "topic": topic,
+            "content": content,
+            "final_score": review.get("score", 0),
+            "revisions": revision + 1
+        }
+
+# ── RUN ───────────────────────────────────────────
+if __name__ == "__main__":
+    supervisor = SupervisorAgent(max_revisions=2)
+    result = supervisor.run(
+        "The future of AI agents in software development"
+    )
+
+    print("\n" + "=" * 60)
+    print(f"📄 Final Content (Score: {result['final_score']}/10, "
+          f"Revisions: {result['revisions']})")
+    print("=" * 60)
+    print(result["content"])
+</code></pre>
+            </div>
+            <div id="s6-langgraph" class="code-panel" style="display:none">
+<pre><code class="language-python">"""
+Stage 6 — Multi-Agent with LangGraph
+WHY: LangGraph makes the routing between agents explicit and visual.
+     The graph structure makes it easy to add/remove agents and change flows.
+"""
+from typing import Annotated, TypedDict, Literal
+from langchain_openai import ChatOpenAI
+from langchain_core.messages import HumanMessage, SystemMessage
+from langgraph.graph import StateGraph, END
+from langgraph.graph.message import add_messages
+
+# ── SHARED STATE ──────────────────────────────────
+class TeamState(TypedDict):
+    messages: Annotated[list, add_messages]
+    research: str       # Output from researcher
+    draft: str          # Output from writer
+    review: str         # Output from reviewer
+    revision_count: int # Track revision attempts
+    status: str         # Current phase
+
+llm = ChatOpenAI(model="gpt-4o", temperature=0.5)
+
+# ── AGENT NODES ───────────────────────────────────
+def researcher_node(state: TeamState) -> dict:
+    """Researcher agent: gathers information."""
+    topic = state["messages"][0].content
+    response = llm.invoke([
+        SystemMessage(content="You are a research specialist. Provide comprehensive, structured research notes."),
+        HumanMessage(content=f"Research: {topic}")
+    ])
+    return {"research": response.content, "status": "researched"}
+
+def writer_node(state: TeamState) -> dict:
+    """Writer agent: creates content from research."""
+    prompt = f"Write an engaging article based on:\n\n{state['research']}"
+    if state.get("review"):
+        prompt += f"\n\nAddress this feedback:\n{state['review']}"
+
+    response = llm.invoke([
+        SystemMessage(content="You are an expert content writer. Write clear, engaging content."),
+        HumanMessage(content=prompt)
+    ])
+    return {
+        "draft": response.content,
+        "revision_count": state.get("revision_count", 0) + 1,
+        "status": "drafted"
+    }
+
+def reviewer_node(state: TeamState) -> dict:
+    """Reviewer agent: critiques the draft."""
+    response = llm.invoke([
+        SystemMessage(content="Review this content. If score >= 8, say APPROVED. Otherwise give specific feedback."),
+        HumanMessage(content=f"Review:\n\n{state['draft']}")
+    ])
+    return {"review": response.content, "status": "reviewed"}
+
+# ── ROUTING LOGIC ─────────────────────────────────
+def review_router(state: TeamState) -> Literal["writer", "__end__"]:
+    """Decide: revise or approve?"""
+    if "APPROVED" in state.get("review", "").upper():
+        return END
+    if state.get("revision_count", 0) >= 3:
+        return END  # Safety limit
+    return "writer"  # Send back for revision
+
+# ── BUILD THE GRAPH ───────────────────────────────
+graph = StateGraph(TeamState)
+
+graph.add_node("researcher", researcher_node)
+graph.add_node("writer", writer_node)
+graph.add_node("reviewer", reviewer_node)
+
+# Flow: researcher → writer → reviewer → (approve or loop to writer)
+graph.set_entry_point("researcher")
+graph.add_edge("researcher", "writer")
+graph.add_edge("writer", "reviewer")
+graph.add_conditional_edges("reviewer", review_router)
+
+team = graph.compile()
+
+# ── RUN ───────────────────────────────────────────
+if __name__ == "__main__":
+    result = team.invoke({
+        "messages": [HumanMessage(content="The future of AI agents in software development")],
+        "research": "", "draft": "", "review": "",
+        "revision_count": 0, "status": "started"
+    })
+
+    print(f"📄 Final Draft (Revisions: {result['revision_count']})")
+    print("=" * 60)
+    print(result["draft"])
+</code></pre>
+            </div>
+        </div>
+
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-6">
+            <h3 class="font-bold text-amber-800 mb-2">🏋️ Stage 6 Capstone Project: Full Content Creation Pipeline</h3>
+            <ul class="text-sm text-amber-900 space-y-1 list-disc list-inside">
+                <li>Build with LangGraph multi-agent graph</li>
+                <li>Add real tools: web search for researcher, file writing for writer</li>
+                <li>Add an "editor" agent that handles final formatting</li>
+                <li>Add a human-in-the-loop approval step before final output</li>
+                <li>Bonus: Add parallel research (multiple researchers on different subtopics)</li>
+            </ul>
+        </div>
+
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-surface-100">
+            <h3 class="font-bold mb-3">✅ Stage 6 Checklist</h3>
+            <div class="space-y-2 text-sm">
+                <label class="flex items-center gap-2 cursor-pointer checklist-item"><input type="checkbox" class="rounded" onchange="updateProgress()"><span>Understand supervisor/worker orchestration pattern</span></label>
+                <label class="flex items-center gap-2 cursor-pointer checklist-item"><input type="checkbox" class="rounded" onchange="updateProgress()"><span>Can build multi-agent systems with raw API calls</span></label>
+                <label class="flex items-center gap-2 cursor-pointer checklist-item"><input type="checkbox" class="rounded" onchange="updateProgress()"><span>Can build multi-agent graphs with LangGraph</span></label>
+                <label class="flex items-center gap-2 cursor-pointer checklist-item"><input type="checkbox" class="rounded" onchange="updateProgress()"><span>Know when multi-agent is worth the complexity</span></label>
+                <label class="flex items-center gap-2 cursor-pointer checklist-item"><input type="checkbox" class="rounded" onchange="updateProgress()"><span>Built the capstone content creation pipeline</span></label>
+            </div>
+        </div>
+    </section>
+
+    <hr class="max-w-5xl mx-auto border-surface-200">
+
+    <!-- ============================================================ -->
+    <!--                  TECH STACK                                  -->
+    <!-- ============================================================ -->
+    <section id="stack" class="py-20 px-8 max-w-5xl mx-auto">
+        <h2 class="text-4xl font-black mb-8">🛠️ The Learning Stack</h2>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-surface-100 stage-card">
+                <div class="text-3xl mb-3">🐍</div>
+                <h3 class="font-bold">Python</h3>
+                <p class="text-sm text-surface-600">Your primary language. Type hints + async support.</p>
+                <code class="text-xs bg-surface-100 px-2 py-1 rounded mt-2 inline-block">python 3.11+</code>
+            </div>
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-surface-100 stage-card">
+                <div class="text-3xl mb-3">🤖</div>
+                <h3 class="font-bold">OpenAI / Anthropic SDK</h3>
+                <p class="text-sm text-surface-600">Raw API access. Start here before any framework.</p>
+                <code class="text-xs bg-surface-100 px-2 py-1 rounded mt-2 inline-block">openai, anthropic</code>
+            </div>
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-surface-100 stage-card">
+                <div class="text-3xl mb-3">🦜</div>
+                <h3 class="font-bold">LangChain</h3>
+                <p class="text-sm text-surface-600">Framework for chains, tools, and prompts.</p>
+                <code class="text-xs bg-surface-100 px-2 py-1 rounded mt-2 inline-block">langchain, langchain-openai</code>
+            </div>
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-surface-100 stage-card">
+                <div class="text-3xl mb-3">📊</div>
+                <h3 class="font-bold">LangGraph</h3>
+                <p class="text-sm text-surface-600">Stateful agent graphs with cycles and persistence.</p>
+                <code class="text-xs bg-surface-100 px-2 py-1 rounded mt-2 inline-block">langgraph</code>
+            </div>
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-surface-100 stage-card">
+                <div class="text-3xl mb-3">💾</div>
+                <h3 class="font-bold">ChromaDB</h3>
+                <p class="text-sm text-surface-600">Local vector database for RAG and memory.</p>
+                <code class="text-xs bg-surface-100 px-2 py-1 rounded mt-2 inline-block">chromadb</code>
+            </div>
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-surface-100 stage-card">
+                <div class="text-3xl mb-3">🔍</div>
+                <h3 class="font-bold">Tavily Search</h3>
+                <p class="text-sm text-surface-600">AI-optimized web search API for agents.</p>
+                <code class="text-xs bg-surface-100 px-2 py-1 rounded mt-2 inline-block">tavily-python</code>
+            </div>
+        </div>
+
+        <!-- Install command -->
+        <div class="bg-surface-900 rounded-xl p-6 text-white">
+            <div class="text-sm text-surface-400 mb-2">📦 Install everything at once:</div>
+<pre><code class="language-bash"># Create a virtual environment
+python -m venv agent-dev && source agent-dev/bin/activate
+
+# Install all dependencies
+pip install openai anthropic langchain langchain-openai langgraph \
+            chromadb tavily-python python-dotenv
+
+# Create .env file for API keys
+echo "OPENAI_API_KEY=sk-..." > .env
+echo "ANTHROPIC_API_KEY=sk-ant-..." >> .env
+echo "TAVILY_API_KEY=tvly-..." >> .env</code></pre>
+        </div>
+    </section>
+
+    <hr class="max-w-5xl mx-auto border-surface-200">
+
+    <!-- ============================================================ -->
+    <!--                  RESOURCES                                   -->
+    <!-- ============================================================ -->
+    <section id="resources" class="py-20 px-8 max-w-5xl mx-auto">
+        <h2 class="text-4xl font-black mb-8">📖 Resources</h2>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-surface-100">
+                <h3 class="font-bold mb-3">📄 Papers</h3>
+                <ul class="space-y-2 text-sm">
+                    <li class="flex gap-2"><span>📌</span><span><strong>ReAct</strong> (Yao et al., 2022) — The foundational agent reasoning paper</span></li>
+                    <li class="flex gap-2"><span>📌</span><span><strong>Chain-of-Thought</strong> (Wei et al., 2022) — Step-by-step reasoning</span></li>
+                    <li class="flex gap-2"><span>📌</span><span><strong>Toolformer</strong> (Schick et al., 2023) — LLMs learning to use tools</span></li>
+                    <li class="flex gap-2"><span>📌</span><span><strong>Generative Agents</strong> (Park et al., 2023) — Multi-agent simulations</span></li>
+                </ul>
+            </div>
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-surface-100">
+                <h3 class="font-bold mb-3">🎓 Courses & Tutorials</h3>
+                <ul class="space-y-2 text-sm">
+                    <li class="flex gap-2"><span>🎯</span><span><strong>DeepLearning.AI</strong> — Andrew Ng's AI agent courses</span></li>
+                    <li class="flex gap-2"><span>🎯</span><span><strong>LangChain Docs</strong> — Official tutorials and cookbooks</span></li>
+                    <li class="flex gap-2"><span>🎯</span><span><strong>LangGraph Academy</strong> — Free multi-agent course</span></li>
+                    <li class="flex gap-2"><span>🎯</span><span><strong>Anthropic Cookbook</strong> — Claude tool use examples</span></li>
+                </ul>
+            </div>
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-surface-100">
+                <h3 class="font-bold mb-3">🧰 Frameworks to Explore</h3>
+                <ul class="space-y-2 text-sm">
+                    <li class="flex gap-2"><span>🔧</span><span><strong>LangGraph</strong> — Best for custom agent architectures</span></li>
+                    <li class="flex gap-2"><span>🔧</span><span><strong>CrewAI</strong> — Easiest for multi-agent teams</span></li>
+                    <li class="flex gap-2"><span>🔧</span><span><strong>AutoGen</strong> — Microsoft's multi-agent framework</span></li>
+                    <li class="flex gap-2"><span>🔧</span><span><strong>Claude Agent SDK</strong> — Anthropic's agent toolkit</span></li>
+                </ul>
+            </div>
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-surface-100">
+                <h3 class="font-bold mb-3">💡 Meta-Principle</h3>
+                <div class="bg-brand-50 rounded-lg p-4">
+                    <p class="text-sm text-brand-800 font-medium">
+                        "Always build the thing twice: once with raw API calls (to understand what's happening), and once with a framework (to understand what it's saving you)."
+                    </p>
+                    <p class="text-xs text-brand-600 mt-2">This habit will make you dramatically better than developers who only use abstractions without understanding the layers underneath.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-surface-900 text-white py-12 px-8">
+        <div class="max-w-5xl mx-auto text-center">
+            <h3 class="text-xl font-bold mb-2">🤖 GenAI Agent Development Roadmap</h3>
+            <p class="text-surface-400 text-sm mb-4">Built for Ram's AI/ML learning journey</p>
+            <p class="text-surface-500 text-xs">Built with Claude Code · February 2026</p>
+        </div>
+    </footer>
+
+</main>
+
+<!-- ============================================================ -->
+<!--                     JAVASCRIPT                               -->
+<!-- ============================================================ -->
+<script>
+// ── Sidebar Toggle (Mobile) ──────────────────────
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('-translate-x-full');
+}
+
+// Close sidebar on mobile when clicking a link
+document.querySelectorAll('.sidebar-link').forEach(link => {
+    link.addEventListener('click', () => {
+        if (window.innerWidth < 1024) {
+            document.getElementById('sidebar').classList.add('-translate-x-full');
+        }
+    });
+});
+
+// ── Code Tab Switching ───────────────────────────
+function switchTab(tabElement, panelId) {
+    // Deactivate all tabs in this tab bar
+    const tabBar = tabElement.parentElement;
+    tabBar.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
+    tabElement.classList.add('active');
+
+    // Hide all panels in this code block
+    const codeBlock = tabBar.parentElement;
+    codeBlock.querySelectorAll('.code-panel').forEach(p => p.style.display = 'none');
+
+    // Show the selected panel
+    document.getElementById(panelId).style.display = 'block';
+
+    // Re-highlight code
+    Prism.highlightAll();
+}
+
+// ── Progress Tracking (LocalStorage) ─────────────
+function updateProgress() {
+    const allChecks = document.querySelectorAll('input[type="checkbox"]');
+    const checked = document.querySelectorAll('input[type="checkbox"]:checked');
+    const pct = Math.round((checked.length / allChecks.length) * 100);
+
+    document.getElementById('progress-pct').textContent = pct + '%';
+    document.getElementById('progress-bar').style.width = pct + '%';
+
+    // Save to localStorage
+    const state = {};
+    allChecks.forEach((cb, i) => { state[i] = cb.checked; });
+    localStorage.setItem('roadmap-progress', JSON.stringify(state));
+}
+
+// Load saved progress
+function loadProgress() {
+    const saved = localStorage.getItem('roadmap-progress');
+    if (saved) {
+        const state = JSON.parse(saved);
+        const allChecks = document.querySelectorAll('input[type="checkbox"]');
+        allChecks.forEach((cb, i) => {
+            if (state[i]) cb.checked = true;
+        });
+        updateProgress();
+    }
+}
+
+// ── Active Sidebar Link Highlighting ─────────────
+function updateActiveSidebarLink() {
+    const sections = document.querySelectorAll('section[id]');
+    const links = document.querySelectorAll('.sidebar-link');
+
+    let current = '';
+    sections.forEach(section => {
+        const top = section.offsetTop - 100;
+        if (window.scrollY >= top) {
+            current = section.getAttribute('id');
+        }
+    });
+
+    links.forEach(link => {
+        link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+    });
+}
+
+window.addEventListener('scroll', updateActiveSidebarLink);
+
+// ── Initialize ───────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    loadProgress();
+    Prism.highlightAll();
+    updateActiveSidebarLink();
+});
+</script>
+
+</body>
+</html>
