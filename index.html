@@ -41,7 +41,10 @@
         .tooltip::after { content: attr(data-tip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 4px 8px; border-radius: 6px; font-size: 12px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
         .tooltip:hover::after { opacity: 1; }
         .checklist-item input:checked + span { text-decoration: line-through; color: #94a3b8; }
-        pre[class*="language-"] { border-radius: 0 0 8px 8px !important; margin: 0 !important; }
+        pre[class*="language-"] { border-radius: 0 0 8px 8px !important; margin: 0 !important; position: relative; }
+        .copy-btn { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.1); color: #94a3b8; border: 1px solid rgba(255,255,255,0.15); padding: 4px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.2s; z-index: 5; }
+        .copy-btn:hover { background: rgba(255,255,255,0.2); color: #e2e8f0; }
+        .copy-btn.copied { background: #065f46; color: #6ee7b7; border-color: #059669; }
         .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
         .accordion-content.open { max-height: 5000px; }
         ::-webkit-scrollbar { width: 6px; }
@@ -2086,10 +2089,33 @@ function updateActiveSidebarLink() {
 
 window.addEventListener('scroll', updateActiveSidebarLink);
 
+// ── Copy Code Buttons ────────────────────────────
+function addCopyButtons() {
+    document.querySelectorAll('pre').forEach(pre => {
+        const btn = document.createElement('button');
+        btn.className = 'copy-btn';
+        btn.textContent = 'Copy';
+        btn.addEventListener('click', () => {
+            const code = pre.querySelector('code');
+            const text = code ? code.textContent : pre.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = 'Copy';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        });
+        pre.appendChild(btn);
+    });
+}
+
 // ── Initialize ───────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
     loadProgress();
     Prism.highlightAll();
+    addCopyButtons();
     updateActiveSidebarLink();
 });
 </script>
